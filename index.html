@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masters Sunday Replay</title>
+<style>
+:root {
+  --masters-green:#003c1f;
+  --masters-green-2:#0b5d2a;
+  --masters-gold:#d7b56d;
+  --cream:#f6f0df;
+  --scoreboard:#062b18;
+  --white:#fffdf5;
+  --red:#c2410c;
+  --muted:#d8d0b9;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at top left, rgba(215,181,109,.18), transparent 34%),
+    linear-gradient(135deg, #f8f2df 0%, #e9dfc1 100%);
+  color:#17210f;
+}
+.container { max-width:1320px; margin:0 auto; padding:26px; }
+.hero {
+  background:linear-gradient(135deg, var(--masters-green), #001f10);
+  color:var(--white);
+  border:4px solid var(--masters-gold);
+  border-radius:28px;
+  padding:26px;
+  margin-bottom:22px;
+  box-shadow:0 18px 35px rgba(0,0,0,.22);
+  position:relative;
+  overflow:hidden;
+}
+.hero:after {
+  content:"";
+  position:absolute;
+  right:-60px;
+  top:-80px;
+  width:260px;
+  height:260px;
+  background:rgba(215,181,109,.14);
+  border-radius:50%;
+}
+.badge {
+  display:inline-block;
+  background:var(--masters-gold);
+  color:#1b260f;
+  font-weight:bold;
+  padding:8px 14px;
+  border-radius:999px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  font-size:12px;
+}
+h1 { font-size:44px; margin:14px 0 6px; letter-spacing:.02em; }
+.subtitle { color:#f3e7c0; font-size:18px; }
+.controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; align-items:center; }
+button, select {
+  font-family: Arial, sans-serif;
+}
+button {
+  border:1px solid var(--masters-gold);
+  background:var(--masters-gold);
+  color:#17210f;
+  padding:11px 17px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:800;
+  box-shadow:0 4px 0 rgba(0,0,0,.25);
+}
+button.secondary { background:transparent; color:var(--white); }
+select {
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--masters-gold);
+  background:#fff8e6;
+}
+.card {
+  background:rgba(255,253,245,.96);
+  border:2px solid rgba(215,181,109,.75);
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:22px;
+  box-shadow:0 12px 28px rgba(36,28,8,.12);
+}
+.score-strip {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-top:20px;
+}
+.kpi {
+  background:var(--scoreboard);
+  color:var(--white);
+  border:2px solid var(--masters-gold);
+  border-radius:18px;
+  padding:16px;
+  min-height:92px;
+}
+.kpi-label {
+  font-family:Arial, sans-serif;
+  color:var(--muted);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+}
+.kpi-value {
+  font-family:Arial, sans-serif;
+  font-size:25px;
+  font-weight:900;
+  margin-top:8px;
+  color:#fff8d9;
+}
+.winnerBox {
+  margin-top:18px;
+  background:linear-gradient(135deg,#fff7d6,#ead080);
+  color:#17210f;
+  border:3px solid var(--masters-gold);
+  border-radius:20px;
+  padding:18px;
+}
+.winnerName {
+  font-size:34px;
+  color:var(--masters-green);
+  font-weight:900;
+  margin:5px 0;
+}
+.progressWrap {
+  width:100%;
+  background:rgba(255,255,255,.2);
+  height:13px;
+  border:1px solid rgba(215,181,109,.7);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:20px;
+}
+.progress {
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--masters-gold),#fff4bd);
+  transition:width .35s ease;
+}
+.grid {
+  display:grid;
+  grid-template-columns:2.2fr .9fr;
+  gap:22px;
+}
+.table-wrap {
+  overflow:auto;
+  max-height:680px;
+  border:3px solid var(--masters-green);
+  border-radius:18px;
+  background:var(--scoreboard);
+}
+table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:980px;
+  font-family:Arial, sans-serif;
+}
+th {
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:var(--masters-green);
+  color:var(--masters-gold);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:12px;
+  padding:13px;
+  border-bottom:2px solid var(--masters-gold);
+}
+td {
+  background:#fffdf5;
+  padding:12px 13px;
+  border-bottom:1px solid #e6d8aa;
+  vertical-align:top;
+}
+tr:nth-child(even) td { background:#fbf4dc; }
+.rank {
+  font-weight:900;
+  color:var(--masters-green);
+  font-size:18px;
+}
+.player-name {
+  font-weight:900;
+  color:#16220d;
+}
+.pick {
+  display:inline-block;
+  background:#e8dec0;
+  color:#102010;
+  border:1px solid #c9ad61;
+  padding:6px 9px;
+  border-radius:999px;
+  margin:3px;
+  font-size:12px;
+  font-weight:800;
+}
+.pick.winner {
+  background:var(--masters-green);
+  color:#fff8d9;
+  border-color:var(--masters-gold);
+}
+.pick.mc {
+  background:#f7d6c7;
+  color:#7c2d12;
+  border-color:#c2410c;
+}
+.live { color:var(--masters-green-2); font-weight:900; }
+.out { color:#9a3412; font-weight:900; }
+.move-up { color:#15803d; font-weight:900; }
+.move-down { color:#c2410c; font-weight:900; }
+.move-same { color:#6b5e3d; font-weight:900; }
+.eliminated td { opacity:.55; }
+.timeline {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.step {
+  background:linear-gradient(135deg,#fff8e6,#f0dfad);
+  border:2px solid #d5bb75;
+  border-radius:18px;
+  padding:13px;
+  cursor:pointer;
+}
+.step.active {
+  background:var(--masters-green);
+  color:#fff8d9;
+  border-color:var(--masters-gold);
+}
+.step-title {
+  font-family:Arial, sans-serif;
+  font-weight:900;
+}
+.step-note {
+  font-family:Arial, sans-serif;
+  color:#5a4a22;
+  font-size:13px;
+  margin-top:5px;
+  line-height:1.35;
+}
+.step.active .step-note { color:#f1e5bd; }
+.note {
+  margin-top:16px;
+  background:#fff4bd;
+  border-left:6px solid var(--masters-gold);
+  border-radius:14px;
+  padding:13px 15px;
+  font-family:Arial, sans-serif;
+  color:#4a3412;
+  line-height:1.45;
+}
+.small { color:#6b5e3d; font-size:12px; }
+@media (max-width:900px) {
+  .grid { grid-template-columns:1fr; }
+  .score-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  h1 { font-size:32px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <section class="hero">
+    <span class="badge">Masters-style replay</span>
+    <h1>Masters Sunday Pick 3 Replay</h1>
+    <div class="subtitle">A broadcast-style pool leaderboard using your uploaded spreadsheet (70 entries)</div>
+
+    <div class="controls">
+      <button id="playBtn">▶ Play Replay</button>
+      <button id="pauseBtn" class="secondary">Pause</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+      <button id="fastBtn" class="secondary">Fast Demo</button>
+      <label>
+        Speed:
+        <select id="speedSelect">
+          <option value="60000" selected>1 tournament hour = 1 minute</option>
+          <option value="15000">1 tournament hour = 15 seconds</option>
+          <option value="5000">1 tournament hour = 5 seconds</option>
+          <option value="1500">1 tournament hour = 1.5 seconds</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="progressWrap"><div id="progress" class="progress"></div></div>
+
+    <div class="score-strip">
+      <div class="kpi"><div class="kpi-label">Replay Time</div><div id="clockKpi" class="kpi-value">--</div></div>
+      <div class="kpi"><div class="kpi-label">Projected Green Jacket</div><div id="winnerKpi" class="kpi-value">--</div></div>
+      <div class="kpi"><div class="kpi-label">Eligible Entries</div><div id="eligibleKpi" class="kpi-value">--</div></div>
+      <div class="kpi"><div class="kpi-label">Pool Leader</div><div id="poolLeaderKpi" class="kpi-value">--</div></div>
+    </div>
+
+    <div id="winnerBox" class="winnerBox">
+      <div>Current pool leader</div>
+      <div id="winnerName" class="winnerName">--</div>
+      <div id="winnerReason" class="small">--</div>
+    </div>
+  </section>
+
+  <div class="note">
+    This is styled to feel like a Masters leaderboard, but it is not an official Masters or Augusta National product. 
+    The replay is simulated to demonstrate your competition engine.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Competition Leaderboard</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Pos</th>
+              <th>Move</th>
+              <th>Player</th>
+              <th>Pick 3</th>
+              <th>Status</th>
+              <th>Tie-break order</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sunday Timeline</h2>
+      <div id="timeline" class="timeline"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const entries = [{"player": "Barty", "picks": ["Bryson DeChambeau", "Tommy Fleetwood", "Cameron Young"]}, {"player": "Enright", "picks": ["Bryson DeChambeau", "Scottie Scheffler", "Jon Rahm"]}, {"player": "Roche SES", "picks": ["Scottie Scheffler", "Bryson DeChambeau", "Rory McIlroy"]}, {"player": "Kitch", "picks": ["Scottie Scheffler", "Xander Schauffele", "Justin Rose"]}, {"player": "Brom", "picks": ["Jon Rahm", "Tommy Fleetwood", "Min Woo Lee"]}, {"player": "Shaw", "picks": ["Bryson DeChambeau", "Tommy Fleetwood", "Matt Fitzpatrick"]}, {"player": "Brian Irish", "picks": ["Matt Fitzpatrick", "Justin Rose", "Ludvig Aberg"]}, {"player": "Jonesy", "picks": ["Cameron Young", "Rory McIlroy", "Justin Thomas"]}, {"player": "Haycock Snr", "picks": ["Corey Conners", "Ludvig Aberg", "Shane Lowry"]}, {"player": "Mal J", "picks": ["Bryson DeChambeau", "Matt Fitzpatrick", "Akshay Bhatia"]}, {"player": "Doc Campbell", "picks": ["Scottie Scheffler", "Patrick Reed", "Bryson DeChambeau"]}, {"player": "T Coleman", "picks": ["Scottie Scheffler", "Xander Schauffele", "Ludvig Aberg"]}, {"player": "A Rose", "picks": ["Bryson DeChambeau", "Xander Schauffele", "Cameron Young"]}, {"player": "D Haycock", "picks": ["Justin Rose", "Patrick Reed", "Jacob Bridgeman"]}, {"player": "P Langley", "picks": ["Rory McIlroy", "DeChambeau", "Cameron Young"]}, {"player": "T Wallace", "picks": ["Matt Fitzpatrick", "Tommy Fleetwood", "Ludvig Aberg"]}, {"player": "K Ferg", "picks": ["Patrick Reed", "J.J. Spaun", "Ludvig Aberg"]}, {"player": "JB", "picks": ["Scottie Scheffler", "Jon Rahm", "Tommy Fleetwood"]}, {"player": "D McCarthy", "picks": ["Tommy Fleetwood", "Xander Schauffele", "Jacob Bridgeman"]}, {"player": "Nath Ferg", "picks": ["Cameron Young", "Matt Fitzpatrick", "Chris Gotterup"]}, {"player": "Muzza T", "picks": ["Ryan Fox", "Tyrrell Hatton", "Rory McIlroy"]}, {"player": "D Donnelly", "picks": ["Bryson DeChambeau", "Patrick Reed", "Si Woo Kim"]}, {"player": "Hancock", "picks": ["Shane Lowry", "Tommy Fleetwood", "Ludvig Aberg"]}, {"player": "B Ashford", "picks": ["Bryson DeChambeau", "Ludvig Aberg", "Justin Rose"]}, {"player": "Bradley C", "picks": ["Patrick Reed", "DeChambeau", "Matt Fitzpatrick"]}, {"player": "Sloanie", "picks": ["Hideki Matsuyama", "Ludvig Aberg", "Rory McIlroy"]}, {"player": "R Fowler", "picks": ["Xander Schauffele", "Rory McIlroy", "Cameron Young"]}, {"player": "Sparky", "picks": ["Akshay Bhatia", "Robert MacIntyre", "Tommy Fleetwood"]}, {"player": "Barley", "picks": ["Scottie Scheffler", "Ludvig Aberg", "Patrick Reed"]}, {"player": "Pete Holly", "picks": ["Gary Woodland", "DeChambeau", "Tommy Fleetwood"]}, {"player": "Timmy S", "picks": ["Justin Rose", "Tommy Fleetwood", "Ludvig Aberg"]}, {"player": "Mr Grant", "picks": ["Scottie Scheffler", "Ludvig Aberg", "Matt Fitzpatrick"]}, {"player": "Greg B", "picks": ["Rory McIlroy", "Tommy Fleetwood", "Ludvig Aberg"]}, {"player": "JD Boy", "picks": ["Scottie Scheffler", "Xander Schauffele", "Ludvig Aberg"]}, {"player": "Mr Manson", "picks": ["Akshay Bhatia", "Ludvig Aberg", "Ryan Fox"]}, {"player": "G Ponting", "picks": ["Nicolai Hojgaard", "Robert MacIntyre", "Si Woo Kim"]}, {"player": "R McKnight", "picks": ["Patrick Reed", "Marco Penge", "Jacob Bridgeman"]}, {"player": "Chalkey", "picks": ["Cameron Young", "Matt Fitzpatrick", "Patrick Reed"]}, {"player": "Budgie", "picks": ["Matt Fitzpatrick", "Straka", "Jacob Bridgeman"]}, {"player": "Lamming", "picks": ["Ludvig Aberg", "Scottie Scheffler", "Viktor Hovland"]}, {"player": "A Bull", "picks": ["Collin Morikawa", "Justin Rose", "Bryson DeChambeau"]}, {"player": "Lynda R", "picks": ["Ludvig Aberg", "Jon Rahm", "Justin Rose"]}, {"player": "Cam P", "picks": ["Justin Rose", "Cameron Young", "Ludvig Aberg"]}, {"player": "Wazza SB", "picks": ["Matt Fitzpatrick", "Robert MacIntyre", "Akshay Bhatia"]}, {"player": "Mac The Knife", "picks": ["Rory McIlroy", "Matt McCarty", "Jason Day"]}, {"player": "Crusader", "picks": ["Scottie Scheffler", "Matt Fitzpatrick", "Bryson DeChambeau"]}, {"player": "Maccas", "picks": ["Adam Scott", "Marco Penge", "Patrick Reed"]}, {"player": "Matt B", "picks": ["Scottie Scheffler", "Ludvig Aberg", "Jon Rahm"]}, {"player": "The Wrangler", "picks": ["Bryson DeChambeau", "Tommy Fleetwood", "Robert MacIntyre"]}, {"player": "AD", "picks": ["Bryson DeChambeau", "Jon Rahm", "Xander Schauffele"]}, {"player": "J Turner", "picks": ["Jon Rahm", "Xander Schauffele", "Ludvig Aberg"]}, {"player": "M Sanders", "picks": ["Jon Rahm", "Matt Fitzpatrick", "Xander Schauffele"]}, {"player": "Nick Fitz", "picks": ["Ludvig Aberg", "Cameron Young", "Adam Scott"]}, {"player": "M Little", "picks": ["Matt Fitzpatrick", "Ludvig Aberg", "Scottie Scheffler"]}, {"player": "T Rowe", "picks": ["Rory McIlroy", "Bryson DeChambeau", "Matt Fitzpatrick"]}, {"player": "J Tilley", "picks": ["Hideki Matsuyama", "Justin Rose", "Jacob Bridgeman"]}, {"player": "Arnie Palmer", "picks": ["Patrick Reed", "Ludvig Aberg", "Bryson DeChambeau"]}, {"player": "K. Sanders", "picks": ["Justin Rose", "Xander Schauffele", "Cameron Young"]}, {"player": "L Adams", "picks": ["Tommy Fleetwood", "Brooks Koepka", "Nicolai Hojgaard"]}, {"player": "K McGinness", "picks": ["Tommy Fleetwood", "Matt Fitzpatrick", "Justin Rose"]}, {"player": "Baylis", "picks": ["Scottie Scheffler", "Ludvig Aberg", "Xander Schauffele"]}, {"player": "D Tucker", "picks": ["Ludvig Aberg", "Patrick Reed", "Jon Rahm"]}, {"player": "Kev Martin", "picks": ["Robert MacIntyre", "Corey Conners", "Ludvig Aberg"]}, {"player": "P Mac", "picks": ["Cameron Young", "Xander Schauffele", "Ludvig Aberg"]}, {"player": "J Barbour", "picks": ["Bryson DeChambeau", "Cameron Young", "Ludvig Aberg"]}, {"player": "P Lund", "picks": ["Cameron Young", "Ludvig Aberg", "Justin Rose"]}, {"player": "Trump H", "picks": ["Bryson DeChambeau", "Xander Schauffele", "Chris Gotterup"]}, {"player": "John Edge", "picks": ["Xander Schauffele", "Hideki Matsuyama", "Cameron Young"]}, {"player": "Trent W", "picks": ["Ludvig Aberg", "Jon Rahm", "Matt Fitzpatrick"]}, {"player": "Sir Steve", "picks": ["Jon Rahm", "Scottie Scheffler", "Ludvig Aberg"]}];
+const frames = [{"time": "Start of Sunday", "clock": "11:00 AM", "leaderNote": "Before leaders tee off — Scheffler projected winner.", "winner": "Scottie Scheffler", "positions": {"Scottie Scheffler": 1, "Rory McIlroy": 2, "Cameron Young": 5, "Xander Schauffele": 6, "Jon Rahm": 7, "Tommy Fleetwood": 8, "Justin Thomas": 10, "Bryson DeChambeau": 999, "Ludvig Aberg": 12, "Justin Rose": 14, "Matt Fitzpatrick": 16, "Shane Lowry": 18, "Min Woo Lee": 20, "Corey Conners": 22, "Patrick Reed": 24}}, {"time": "Early Front Nine", "clock": "12:00 PM", "leaderNote": "Scheffler still controls the projected pool.", "winner": "Scottie Scheffler", "positions": {"Scottie Scheffler": 1, "Rory McIlroy": 2, "Cameron Young": 4, "Xander Schauffele": 7, "Jon Rahm": 8, "Tommy Fleetwood": 9, "Justin Thomas": 11, "Bryson DeChambeau": 999, "Ludvig Aberg": 13, "Justin Rose": 15, "Matt Fitzpatrick": 17, "Shane Lowry": 19, "Min Woo Lee": 21, "Corey Conners": 23, "Patrick Reed": 25}}, {"time": "Mid Front Nine", "clock": "1:00 PM", "leaderNote": "Rory moves into the projected winner position.", "winner": "Rory McIlroy", "positions": {"Rory McIlroy": 1, "Scottie Scheffler": 2, "Cameron Young": 4, "Xander Schauffele": 7, "Jon Rahm": 8, "Tommy Fleetwood": 10, "Justin Thomas": 12, "Bryson DeChambeau": 999, "Ludvig Aberg": 14, "Justin Rose": 16, "Matt Fitzpatrick": 18, "Shane Lowry": 20, "Min Woo Lee": 22, "Corey Conners": 24, "Patrick Reed": 26}}, {"time": "The Turn", "clock": "2:00 PM", "leaderNote": "Roche leads the pool with Rory + Scheffler.", "winner": "Rory McIlroy", "positions": {"Rory McIlroy": 1, "Scottie Scheffler": 2, "Cameron Young": 3, "Xander Schauffele": 6, "Jon Rahm": 9, "Justin Thomas": 10, "Tommy Fleetwood": 11, "Bryson DeChambeau": 999, "Ludvig Aberg": 13, "Justin Rose": 15, "Matt Fitzpatrick": 17, "Shane Lowry": 20, "Min Woo Lee": 23, "Corey Conners": 25, "Patrick Reed": 27}}, {"time": "Amen Corner Pressure", "clock": "3:00 PM", "leaderNote": "Young and Schauffele put pressure on the tie-breaks.", "winner": "Rory McIlroy", "positions": {"Rory McIlroy": 1, "Scottie Scheffler": 2, "Cameron Young": 3, "Xander Schauffele": 5, "Justin Thomas": 9, "Jon Rahm": 10, "Tommy Fleetwood": 12, "Bryson DeChambeau": 999, "Ludvig Aberg": 14, "Justin Rose": 16, "Matt Fitzpatrick": 18, "Shane Lowry": 21, "Min Woo Lee": 24, "Corey Conners": 26, "Patrick Reed": 28}}, {"time": "Late Sunday", "clock": "4:00 PM", "leaderNote": "Rory still winner. Roche remains ahead on Scheffler tie-break.", "winner": "Rory McIlroy", "positions": {"Rory McIlroy": 1, "Scottie Scheffler": 2, "Cameron Young": 3, "Xander Schauffele": 8, "Justin Thomas": 10, "Jon Rahm": 14, "Tommy Fleetwood": 21, "Matt Fitzpatrick": 24, "Justin Rose": 28, "Ludvig Aberg": 35, "Patrick Reed": 38, "Shane Lowry": 45, "Corey Conners": 50, "Min Woo Lee": 52, "Bryson DeChambeau": 999}}, {"time": "Final Result", "clock": "5:00 PM", "leaderNote": "Final: Roche SES wins before the 3rd-pick tie-break.", "winner": "Rory McIlroy", "positions": {"Rory McIlroy": 1, "Scottie Scheffler": 2, "Cameron Young": 3, "Xander Schauffele": 8, "Justin Thomas": 10, "Jon Rahm": 14, "Tommy Fleetwood": 21, "Matt Fitzpatrick": 24, "Justin Rose": 28, "Ludvig Aberg": 35, "Patrick Reed": 38, "Shane Lowry": 45, "Corey Conners": 50, "Min Woo Lee": 52, "Ryan Fox": 55, "Tyrrell Hatton": 60, "Bryson DeChambeau": 999, "Akshay Bhatia": 999, "Hideki Matsuyama": 999, "J.J. Spaun": 999, "Jacob Bridgeman": 999, "Robert MacIntyre": 999, "Brooks Koepka": 999, "Nicolai Hojgaard": 999, "Viktor Hovland": 999, "Collin Morikawa": 999, "Adam Scott": 999, "Jason Day": 999, "Gary Woodland": 999, "Marco Penge": 999, "Chris Gotterup": 999, "Si Woo Kim": 999, "Matt McCarty": 999}}];
+let currentFrame = 0;
+let timer = null;
+let previousRanks = {};
+
+function posLabel(pos) {
+  if (!pos || pos >= 999) return "MC";
+  return "#" + pos;
+}
+
+function getPosition(frame, golfer) {
+  return frame.positions[golfer] || 999;
+}
+
+function rankEntries(frame) {
+  return entries.map(entry => {
+    const hasWinner = entry.picks.includes(frame.winner);
+    const pickResults = entry.picks.map(p => ({
+      name: p,
+      position: getPosition(frame, p),
+      isWinner: p === frame.winner
+    })).sort((a,b) => a.position - b.position || a.name.localeCompare(b.name));
+
+    return {
+      ...entry,
+      eligible: hasWinner,
+      pickResults,
+      sortKey: [
+        hasWinner ? 0 : 1,
+        pickResults[0].position,
+        pickResults[1].position,
+        pickResults[2].position,
+        entry.player
+      ]
+    };
+  }).sort((a,b) => {
+    for (let i = 0; i < a.sortKey.length; i++) {
+      if (a.sortKey[i] < b.sortKey[i]) return -1;
+      if (a.sortKey[i] > b.sortKey[i]) return 1;
+    }
+    return 0;
+  });
+}
+
+function render(frameIndex) {
+  currentFrame = frameIndex;
+  const frame = frames[frameIndex];
+  const ranked = rankEntries(frame);
+  const eligible = ranked.filter(r => r.eligible);
+  const leader = eligible[0];
+
+  document.getElementById("clockKpi").textContent = frame.clock;
+  document.getElementById("winnerKpi").textContent = frame.winner;
+  document.getElementById("eligibleKpi").textContent = eligible.length;
+  document.getElementById("poolLeaderKpi").textContent = leader ? leader.player : "Jackpot";
+  document.getElementById("winnerName").textContent = leader ? leader.player : "Jackpot";
+  document.getElementById("winnerReason").textContent = leader
+    ? frame.leaderNote + " Tie-break: " + leader.pickResults.map(x => x.name + " " + posLabel(x.position)).join(" → ")
+    : "Nobody currently has the projected tournament winner.";
+  document.getElementById("progress").style.width = ((frameIndex) / (frames.length - 1) * 100) + "%";
+
+  const body = document.getElementById("leaderboardBody");
+  body.innerHTML = "";
+
+  let eligibleRank = 0;
+  const nextPreviousRanks = {};
+
+  ranked.forEach((r) => {
+    let rankText = "OUT";
+    let movement = "";
+    let moveClass = "move-same";
+
+    if (r.eligible) {
+      eligibleRank += 1;
+      rankText = eligibleRank;
+      nextPreviousRanks[r.player] = eligibleRank;
+
+      const prev = previousRanks[r.player];
+      if (!prev) {
+        movement = "NEW";
+        moveClass = "move-up";
+      } else if (eligibleRank < prev) {
+        movement = "▲ " + (prev - eligibleRank);
+        moveClass = "move-up";
+      } else if (eligibleRank > prev) {
+        movement = "▼ " + (eligibleRank - prev);
+        moveClass = "move-down";
+      } else {
+        movement = "—";
+      }
+    }
+
+    const tr = document.createElement("tr");
+    if (!r.eligible) tr.className = "eliminated";
+
+    const picksHtml = r.picks.map(p => {
+      const pos = getPosition(frame, p);
+      const cls = "pick " + (p === frame.winner ? "winner " : "") + (pos >= 999 ? "mc" : "");
+      return `<span class="${cls}">${p} <span class="small">${posLabel(pos)}</span></span>`;
+    }).join("");
+
+    const tieHtml = r.pickResults.map(x => `${x.name} (${posLabel(x.position)})`).join(" → ");
+
+    tr.innerHTML = `
+      <td class="rank">${rankText}</td>
+      <td class="${moveClass}">${movement}</td>
+      <td class="player-name">${r.player}</td>
+      <td>${picksHtml}</td>
+      <td class="${r.eligible ? "live" : "out"}">${r.eligible ? "LIVE" : "OUT"}</td>
+      <td>${tieHtml}</td>
+    `;
+    body.appendChild(tr);
+  });
+
+  previousRanks = nextPreviousRanks;
+  renderTimeline();
+}
+
+function renderTimeline() {
+  const timeline = document.getElementById("timeline");
+  timeline.innerHTML = "";
+  frames.forEach((f, i) => {
+    const div = document.createElement("div");
+    div.className = "step" + (i === currentFrame ? " active" : "");
+    div.onclick = () => render(i);
+    div.innerHTML = `
+      <div class="step-title">${f.clock} — ${f.time}</div>
+      <div class="step-note">${f.leaderNote}</div>
+    `;
+    timeline.appendChild(div);
+  });
+}
+
+function play() {
+  if (timer) clearInterval(timer);
+  const delay = Number(document.getElementById("speedSelect").value);
+  timer = setInterval(() => {
+    if (currentFrame >= frames.length - 1) {
+      clearInterval(timer);
+      timer = null;
+      return;
+    }
+    render(currentFrame + 1);
+  }, delay);
+}
+
+document.getElementById("playBtn").onclick = play;
+document.getElementById("pauseBtn").onclick = () => { if (timer) clearInterval(timer); timer = null; };
+document.getElementById("resetBtn").onclick = () => { if (timer) clearInterval(timer); timer = null; previousRanks = {}; render(0); };
+document.getElementById("fastBtn").onclick = () => {
+  document.getElementById("speedSelect").value = "1500";
+  play();
+};
+
+render(0);
+</script>
+</body>
+</html>

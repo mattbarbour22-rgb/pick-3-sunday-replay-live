@@ -1,0 +1,1 @@
+Masters-style replay website. Unzip, open index.html, or upload the extracted files to GitHub/Vercel.
